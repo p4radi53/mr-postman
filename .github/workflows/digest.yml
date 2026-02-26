@@ -1,0 +1,38 @@
+name: Daily Digest
+
+on:
+  schedule:
+    # Run every day at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  send-digest:
+    name: Fetch · Summarise · Send
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Write feeds config
+        run: echo '${{ secrets.FEEDS_CONFIG }}' > feeds.json
+
+      - name: Run Mr. Postman
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: uv run mr-postman

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mr. Postman — {{ date.strftime('%d %B %Y') }}</title>
+  <style>
+    /* Reset */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; }
+
+    /* Base */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      font-family: Georgia, "Times New Roman", serif;
+      color: #222222;
+    }
+
+    .wrapper {
+      width: 100%;
+      background-color: #f4f4f4;
+      padding: 24px 0;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+    }
+
+    /* Header */
+    .header {
+      background-color: #1a1a2e;
+      padding: 28px 36px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0 0 4px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #f0e6d3;
+      letter-spacing: 1px;
+      font-family: Georgia, serif;
+    }
+    .header .tagline {
+      margin: 0;
+      font-size: 12px;
+      color: #a89880;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: Arial, sans-serif;
+    }
+    .header .date-line {
+      margin: 10px 0 0;
+      font-size: 13px;
+      color: #c8b89a;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Region label pill */
+    .region-label {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-family: Arial, sans-serif;
+      margin-bottom: 6px;
+    }
+    .region-poland  { background-color: #dc143c; color: #fff; }
+    .region-europe  { background-color: #003399; color: #fff; }
+    .region-us      { background-color: #b22234; color: #fff; }
+
+    /* Story card */
+    .story {
+      padding: 24px 36px;
+      border-bottom: 1px solid #ebebeb;
+    }
+    .story:last-child { border-bottom: none; }
+    .story .rank {
+      font-size: 11px;
+      color: #999;
+      font-family: Arial, sans-serif;
+      margin-bottom: 4px;
+    }
+    .story h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.35;
+      font-family: Georgia, serif;
+      color: #1a1a2e;
+    }
+    .story h2 a {
+      color: #1a1a2e;
+      text-decoration: none;
+    }
+    .story h2 a:hover { text-decoration: underline; }
+    .story p {
+      margin: 0 0 10px;
+      font-size: 15px;
+      line-height: 1.65;
+      color: #444;
+    }
+    .story .meta {
+      font-size: 11px;
+      color: #999;
+      font-family: Arial, sans-serif;
+    }
+    .story .meta a {
+      color: #777;
+      text-decoration: none;
+    }
+    .story .tags {
+      margin-top: 8px;
+    }
+    .story .tag {
+      display: inline-block;
+      background: #f0f0f0;
+      color: #666;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 2px;
+      margin-right: 4px;
+      font-family: Arial, sans-serif;
+      text-transform: lowercase;
+    }
+
+    /* Section dividers */
+    .section-header {
+      background-color: #f7f7f7;
+      border-top: 2px solid #1a1a2e;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 36px;
+    }
+    .section-header h3 {
+      margin: 0;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #555;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #1a1a2e;
+      padding: 20px 36px;
+      text-align: center;
+    }
+    .footer p {
+      margin: 0;
+      font-size: 11px;
+      color: #7a7a9a;
+      font-family: Arial, sans-serif;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+<table class="container" cellpadding="0" cellspacing="0" width="640">
+
+  <!-- HEADER -->
+  <tr>
+    <td class="header">
+      <h1>Mr. Postman</h1>
+      <p class="tagline">Daily Political Digest</p>
+      <p class="date-line">{{ date.strftime('%A, %d %B %Y') }} &bull; UTC</p>
+    </td>
+  </tr>
+
+  {% set ns = namespace(current_region=None) %}
+  {% for story in stories %}
+
+    {% if story.region != ns.current_region %}
+      {% set ns.current_region = story.region %}
+      <tr>
+        <td class="section-header">
+          <h3>
+            {% if story.region == 'poland' %}Poland
+            {% elif story.region == 'europe' %}Europe
+            {% elif story.region == 'us' %}United States
+            {% else %}{{ story.region | title }}
+            {% endif %}
+          </h3>
+        </td>
+      </tr>
+    {% endif %}
+
+    <tr>
+      <td class="story">
+        <div class="rank">#{{ story.rank }}</div>
+        <span class="region-label region-{{ story.region }}">
+          {% if story.region == 'poland' %}PL
+          {% elif story.region == 'europe' %}EU
+          {% elif story.region == 'us' %}US
+          {% else %}{{ story.region | upper }}
+          {% endif %}
+        </span>
+        <h2>
+          {% if story.url %}
+            <a href="{{ story.url }}" target="_blank" rel="noopener">{{ story.headline }}</a>
+          {% else %}
+            {{ story.headline }}
+          {% endif %}
+        </h2>
+        <p>{{ story.summary }}</p>
+        <div class="meta">
+          {{ story.source_name }}
+          {% if story.url %}
+            &bull; <a href="{{ story.url }}" target="_blank" rel="noopener">Read more &rarr;</a>
+          {% endif %}
+        </div>
+        {% if story.tags %}
+        <div class="tags">
+          {% for tag in story.tags %}
+          <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </td>
+    </tr>
+
+  {% else %}
+  <tr>
+    <td style="padding: 36px; text-align: center; color: #999; font-family: Arial, sans-serif; font-size: 14px;">
+      No stories found for today.
+    </td>
+  </tr>
+  {% endfor %}
+
+  <!-- FOOTER -->
+  <tr>
+    <td class="footer">
+      <p>
+        Mr. Postman &bull; AI-curated via GPT-4o<br/>
+        Sources: Polsat News, Krytyka Polityczna, OSW, BBC Europe,
+        EUobserver, Le Monde Diplomatique, Washington Post Politics<br/>
+        Generated {{ date.strftime('%Y-%m-%d %H:%M') }} UTC
+      </p>
+    </td>
+  </tr>
+
+</table>
+</div>
+</body>
+</html>
